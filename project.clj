@@ -8,9 +8,11 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [ring/ring-json "0.3.1"]
                  [compojure "1.1.8"]
+                 [ring/ring-jetty-adapter "1.2.1"]
                  [rapipago_scraper "0.1.0"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler rapipago_api.handler/app}
+  :main "rapipago_api.server"
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}})
