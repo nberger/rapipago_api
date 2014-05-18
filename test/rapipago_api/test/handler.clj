@@ -1,7 +1,8 @@
 (ns rapipago_api.test.handler
   (:require [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
-            [rapipago-scraper.cities :as cities])
+            [rapipago-scraper.cities :as cities]
+            [cheshire.core :as json])
   (:use clojure.test
         ring.mock.request  
         rapipago_api.handler))
@@ -14,7 +15,8 @@
     (with-redefs [rapipago/search (constantly dummy-stores)]
       (let [response (app (request :get "/provinces/C/cities/ALMAGRO/stores"))]
         (is (= (:status response) 200))
-        (is (= (:body response) dummy-stores)))))
+        (is (= (json/parse-string (:body response) true)
+               dummy-stores)))))
 
   (def dummy-provinces '({:name "Corrientes" :id "C"}
                          {:name "Salta" :id "S"}))
@@ -22,7 +24,8 @@
     (with-redefs [provinces/find-all (constantly dummy-provinces)]
       (let [response (app (request :get "/provinces"))]
         (is (= (:status response) 200))
-        (is (= (:body response) dummy-provinces)))))
+        (is (= (json/parse-string (:body response) true)
+               dummy-provinces)))))
 
   (def dummy-cities '({:name "Goya" :id "Goya"}
                       {:name "Corrientes" :id "Corrientes"}))
@@ -30,8 +33,9 @@
     (with-redefs [cities/find-in-province (constantly dummy-cities)]
       (let [response (app (request :get "/provinces/C/cities"))]
         (is (= (:status response) 200))
-        (is (= (:body response) [{:name "Goya" :id "Goya"}
-                                 {:name "Corrientes" :id "Corrientes"}])))))
+        (is (= (json/parse-string (:body response) true)
+               [{:name "Goya" :id "Goya"}
+                {:name "Corrientes" :id "Corrientes"}])))))
   
   (testing "not-found route"
     (let [response (app (request :get "/invalid"))]
