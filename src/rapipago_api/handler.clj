@@ -6,6 +6,7 @@
             [compojure.route :as route]
             [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
+            [ring.middleware.cors :refer [wrap-cors]]
             [rapipago-scraper.cities :as cities]))
 
 (defroutes app-routes
@@ -24,4 +25,6 @@
   (->
     (handler/site app-routes)
     wrap-json-response
-    wrap-json-body))
+    wrap-json-body
+    (wrap-cors :access-control-allow-origin #".*"
+               :access-control-allow-methods [:get])))
