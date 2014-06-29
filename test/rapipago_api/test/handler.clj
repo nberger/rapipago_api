@@ -12,7 +12,8 @@
                       {:address "Sarandi 6412" :id "543423" :name "Awesome Rapipago"}))
 
   (testing "search"
-    (with-redefs [rapipago/search (constantly dummy-stores)]
+    (with-redefs [rapipago/search (constantly dummy-stores)
+                  rapipago_api.handler/geolocate identity]
       (let [response (app (request :get "/provinces/C/cities/ALMAGRO/stores"))]
         (is (= (:status response) 200))
         (is (= (json/parse-string (:body response) true)
