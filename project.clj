@@ -13,7 +13,7 @@
                  [rapipago_scraper "0.1.0"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler rapipago_api.handler/app}
-  :main "rapipago_api.server"
+  :main rapipago_api.server
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}})
