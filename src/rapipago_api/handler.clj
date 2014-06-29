@@ -11,12 +11,12 @@
 
 (defroutes app-routes
   (GET "/provinces" []
-       {:body (provinces/find-all)})
+       (response (provinces/find-all)))
   (GET "/provinces/:province_id/cities" [province_id]
-       {:body (cities/find-in-province {:id province_id})})
+       (response (cities/find-in-province {:id province_id})))
   (GET "/provinces/:province_id/cities/:city_id/stores" [province_id city_id]
-       {:body (rapipago/search {:province {:id province_id}
-                                :city     {:id city_id}})})
+       (response (rapipago/search {:province {:id province_id}
+                                :city     {:id city_id}})))
 
   (route/resources "/")
   (route/not-found "Not Found"))
