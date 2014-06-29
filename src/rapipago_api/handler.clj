@@ -4,10 +4,33 @@
         [ring.util.response :only [response]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
+            [clojure.core.cache :as cache]
             [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
             [ring.middleware.cors :refer [wrap-cors]]
             [rapipago-scraper.cities :as cities]))
+
+(def db (atom (cache/basic-cache-factory {})))
+
+(defn provinces [db]
+  (let [key :provinces
+        c @db
+        newdb (if (cache/has? c key)
+                (cache/hit c key)
+               (cache/miss c key (->> (provinces/find-all)
+                                      (map (juxt :id :name))
+                                      (into {}))))]
+    (reset! db newdb)
+    (cache/lookup newdb key)))
+
+
+(defn full-address [{address :address {province-id :id} :province {city-name :name} :city}]
+  (let [province-name (get (provinces db) province-id)]
+    (apply str (interpose ", " [address city-name province-name "Argentina"]))))
+
+(comment
+  (get (provinces db) "A")
+  (full-address (first (rapipago/search {:province {:id "E"} :city {:id "CHAJARI" :name "CHAJARI"}}))))
 
 (defroutes app-routes
   (GET "/provinces" []
