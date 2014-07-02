@@ -93,6 +93,18 @@
 
   (refresh-city-index "C" "PALERMO")
 
+  (defn refresh-province [province-id threads-count]
+    (let [out *out*
+          cities (cities/find-in-province {:id province-id})]
+      (cp/pmap threads-count
+               (fn [city]
+                 (binding [*out* out]
+                   (let [stores-in-city (refresh-city-index province-id (:id city))]
+                     (println (:name city) ": " (count stores-in-city)))))
+               cities)))
+
+  (refresh-province "C" 8)
+
 )
 
 (defn search [{:keys [province-id city-id]}]

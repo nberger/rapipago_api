@@ -13,6 +13,7 @@
                  [ring-cors "0.1.4"]
                  [clojurewerkz/elastisch "2.0.0"]
                  [rapipago_scraper "0.1.0"]
+                 [com.climate/claypoole "0.2.2"]
                  [geocoder-clj "0.2.4"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler rapipago_api.handler/app}
