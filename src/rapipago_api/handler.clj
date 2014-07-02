@@ -11,19 +11,20 @@
             [rapipago_api.es_store :as es_store]))
 
 (defn search-stores [province-id city-id]
-  (->> {:province {:id province-id}
-        :city     {:id city-id}}
-       rapipago/search
-       (map geolocate)))
+  (es_store/search {:province-id province-id
+                    :city-id     city-id}))
 
 (defroutes app-routes
   (GET "/provinces" []
        (response (provinces/find-all)))
   (GET "/provinces/:province-id/cities" [province-id]
        (response (cities/find-in-province {:id province-id})))
+  (GET "/location/:lat,:lon/distance/:distance/stores" [lat lon distance]
+       (response (es_store/distance-search {:lat lat
+                                            :lon lon}
+                                           distance)))
   (GET "/provinces/:province-id/cities/:city-id/stores" [province-id city-id]
-       (response (->> (search-stores province-id city-id)
-                      (take 20))))
+       (response (search-stores province-id city-id)))
 
   (route/resources "/")
   (route/not-found "Not Found"))

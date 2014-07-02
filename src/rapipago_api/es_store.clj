@@ -32,6 +32,7 @@
                                                     :address {:type "string"
                                                               :store "yes"
                                                               :index "not_analyzed"}
+                                                    :location {:type "geo_point"}
                                                     :name {:type "string"
                                                            :store "yes"
                                                            :index "not_analyzed"}}}})))
@@ -66,7 +67,8 @@
              google/geocode-address
              first
              :geometry
-             :location)))
+             :location
+             (clojure.set/rename-keys {:lng :lon}))))
 
 (comment
   (def store (first (rapipago/search {:province {:id "C"}
@@ -117,6 +119,16 @@
         hits (esrsp/hits-from res)]
     (map :_source hits)))
 
+(defn distance-search [center distance]
+  (let [query {:filtered {:query (q/match-all)
+                          :filter {:geo_distance {:distance distance
+                                                  :location center}}}}
+        res (esd/search es-conn index-name "rapipago"
+                        :query query
+                        :size 100)
+        hits (esrsp/hits-from res)]
+    (map :_source hits))
+  )
 (comment
 
   (->> (esd/search es-conn index-name "rapipago"
@@ -128,5 +140,9 @@
 
   (count (search {:province-id "B" :city-id "LANUS"}))
   (count (search {:province-id "C" :city-id "BALVANERA"}))
+
+  (distance-search {:lat -34.603272
+                    :lon -58.396726}
+                   "500m")
 
   )
