@@ -4,62 +4,27 @@
         [ring.util.response :only [response]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
-            [clojure.core.cache :as cache]
-            [geocoder.google :as google]
+            [ring.middleware.cors :refer [wrap-cors]]
             [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
-            [ring.middleware.cors :refer [wrap-cors]]
-            [rapipago-scraper.cities :as cities]))
-
-(def db (atom (cache/basic-cache-factory {})))
-
-(defn provinces [db]
-  (let [key :provinces
-        c @db
-        newdb (if (cache/has? c key)
-                (cache/hit c key)
-               (cache/miss c key (->> (provinces/find-all)
-                                      (map (juxt :id :name))
-                                      (into {}))))]
-    (reset! db newdb)
-    (cache/lookup newdb key)))
-
-
-(defn full-address [{address :address {province-id :id} :province {city-id :id} :city}]
-  (let [province-name (get (provinces db) province-id)]
-    (apply str (interpose ", " [address city-id province-name "Argentina"]))))
-
-(comment
-  (get (provinces db) "A")
-  (full-address (first (rapipago/search {:province {:id "E"} :city {:id "CHAJARI"}}))))
-
-(defn geolocate [rapipago]
-  (assoc rapipago :location
-         (-> (full-address rapipago)
-             google/geocode-address
-             first
-             :geometry
-             :location)))
-
-(comment
-  (def store (first (rapipago/search {:province {:id "C"} :city {:id "PALERMO" :name "PALERMO"}})))
-  (full-address store)
-  (geolocate store))
+            [rapipago-scraper.cities :as cities]
+            [rapipago_api.es_store :as es_store]))
 
 (defn search-stores [province-id city-id]
-  (->> {:province {:id province-id}
-        :city     {:id city-id}}
-       rapipago/search
-       (map geolocate)))
+  (es_store/search {:province-id province-id
+                    :city-id     city-id}))
 
 (defroutes app-routes
   (GET "/provinces" []
        (response (provinces/find-all)))
   (GET "/provinces/:province-id/cities" [province-id]
        (response (cities/find-in-province {:id province-id})))
+  (GET "/location/:lat,:lon/distance/:distance/stores" [lat lon distance]
+       (response (es_store/distance-search {:lat lat
+                                            :lon lon}
+                                           distance)))
   (GET "/provinces/:province-id/cities/:city-id/stores" [province-id city-id]
-       (response (->> (search-stores province-id city-id)
-                      (take 20))))
+       (response (search-stores province-id city-id)))
 
   (route/resources "/")
   (route/not-found "Not Found"))
