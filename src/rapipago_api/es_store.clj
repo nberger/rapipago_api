@@ -127,10 +127,25 @@
                         :query query
                         :size 100)
         hits (esrsp/hits-from res)]
-    (map :_source hits))
-  )
-(comment
+    (map :_source hits)))
 
+(defn trbl->tlbr [top-right bottom-left]
+  [{:lat (:lat top-right) :lon (:lon bottom-left)}
+    {:lat (:lat bottom-left) :lon (:lon top-right)}])
+
+(defn bounding-box-search [top-right bottom-left]
+  (let [[top-left bottom-right] (trbl->tlbr top-right bottom-left)
+        query {:filtered {:query (q/match-all)
+                          :filter {:geo_bounding_box
+                                   {:location {:top_left top-left
+                                               :bottom_right bottom-right}}}}}
+        res (esd/search es-conn index-name "rapipago"
+                        :query query
+                        :size 100)
+        hits (esrsp/hits-from res)]
+    (map :_source hits)))
+
+(comment
   (->> (esd/search es-conn index-name "rapipago"
                    :query (q/bool :must
                                   [(q/term :city-id "BALVANERA")
@@ -145,4 +160,9 @@
                     :lon -58.396726}
                    "500m")
 
+
+  (bounding-box-search {:lat -34.58023769631528
+                        :lon -58.38676964013672}
+                       {:lat -34.62262718004927
+                        :lon -58.45543419091797})
   )

@@ -23,6 +23,9 @@
        (response (es_store/distance-search {:lat lat
                                             :lon lon}
                                            distance)))
+  (GET "/bounding_box/:tr_lat,:tr_lon,:bl_lat,:bl_lon/stores" [tr_lat tr_lon bl_lat bl_lon distance]
+       (response (es_store/bounding-box-search {:lat tr_lat :lon tr_lon}
+                                               {:lat bl_lat :lon bl_lon})))
   (GET "/provinces/:province-id/cities/:city-id/stores" [province-id city-id]
        (response (search-stores province-id city-id)))
 
