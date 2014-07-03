@@ -107,6 +107,7 @@
 
   (refresh-province "C" 8)
 
+  (doseq [province (keys (provinces db))] (refresh-province province 10))
 )
 
 (defn search [{:keys [province-id city-id]}]
