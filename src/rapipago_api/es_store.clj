@@ -13,8 +13,10 @@
 
 (def index-name "rapipago")
 
-(defn connect [port]
-  (es/connect (str "http://127.0.0.1:" port)))
+(def es-url (or (System/getenv "BONSAI_URL") (str "http://127.0.0.1:" 9200)))
+
+(defn connect []
+  (es/connect es-url))
 
 (defn create-index [conn index]
   (when-not (esi/exists? conn index)
@@ -37,7 +39,7 @@
                                                            :store "yes"
                                                            :index "not_analyzed"}}}})))
 
-(def es-conn (connect 9200))
+(def es-conn (connect))
 (create-index es-conn index-name)
 
 (def db (atom (cache/basic-cache-factory {})))
@@ -85,11 +87,11 @@
     (esd/put conn index-name "rapipago" (:id rapipago) doc)))
 
 (defn refresh-city-index [province-id city-id]
-  (let [conn (connect 9200)]
-  (->> {:province {:id province-id} :city {:id city-id}}
-       rapipago/search
-       (map geolocate)
-       (map #(save-rapipago conn %)))))
+  (let [conn (connect)]
+    (->> {:province {:id province-id} :city {:id city-id}}
+         rapipago/search
+         (map geolocate)
+         (map #(save-rapipago conn %)))))
 
 (comment
 
