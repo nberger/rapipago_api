@@ -15,9 +15,6 @@
 
 (def es-url (or (System/getenv "BONSAI_URL") (str "http://127.0.0.1:" 9200)))
 
-(defn connect []
-  (es/connect es-url))
-
 (defn create-index [conn index]
   (when-not (esi/exists? conn index)
     (esi/create conn
@@ -39,8 +36,10 @@
                                                            :store "yes"
                                                            :index "not_analyzed"}}}})))
 
-(def es-conn (connect))
-(create-index es-conn index-name)
+(defn connect []
+  (let [connection (es/connect es-url)]
+    (create-index connection index-name)
+    connection))
 
 (def db (atom (cache/basic-cache-factory {})))
 
@@ -116,7 +115,7 @@
   (let [query (q/bool
                 :must [(q/term :city-id city-id)
                        (q/term :province-id province-id)])
-        res (esd/search es-conn index-name "rapipago"
+        res (esd/search (connect) index-name "rapipago"
                         :query query
                         :size 1000)
         hits (esrsp/hits-from res)]
@@ -126,7 +125,7 @@
   (let [query {:filtered {:query (q/match-all)
                           :filter {:geo_distance {:distance distance
                                                   :location center}}}}
-        res (esd/search es-conn index-name "rapipago"
+        res (esd/search (connect) index-name "rapipago"
                         :query query
                         :size 100)
         hits (esrsp/hits-from res)]
@@ -142,14 +141,14 @@
                           :filter {:geo_bounding_box
                                    {:location {:top_left top-left
                                                :bottom_right bottom-right}}}}}
-        res (esd/search es-conn index-name "rapipago"
+        res (esd/search (connect) index-name "rapipago"
                         :query query
                         :size 100)
         hits (esrsp/hits-from res)]
     (map :_source hits)))
 
 (comment
-  (->> (esd/search es-conn index-name "rapipago"
+  (->> (esd/search (connect) index-name "rapipago"
                    :query (q/bool :must
                                   [(q/term :city-id "BALVANERA")
                                    (q/term :province-id "D")]))
