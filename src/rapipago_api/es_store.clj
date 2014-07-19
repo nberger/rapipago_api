@@ -127,7 +127,7 @@
                                                   :location center}}}}
         res (esd/search (connect) index-name "rapipago"
                         :query query
-                        :size 100)
+                        :size 1000)
         hits (esrsp/hits-from res)]
     (map :_source hits)))
 
@@ -143,7 +143,7 @@
                                                :bottom_right bottom-right}}}}}
         res (esd/search (connect) index-name "rapipago"
                         :query query
-                        :size 100)
+                        :size 1000)
         hits (esrsp/hits-from res)]
     (map :_source hits)))
 
