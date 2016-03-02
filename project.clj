@@ -11,6 +11,7 @@
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.4.0"]
                  [ring-cors "0.1.7"]
+                 [ring-logger "0.7.5"]
                  [clojurewerkz/elastisch "2.2.1"]
                  [rapipago_scraper "0.1.1-SNAPSHOT"]
                  [com.climate/claypoole "1.1.2"]

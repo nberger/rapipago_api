@@ -4,6 +4,7 @@
         [ring.util.response :only [response]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
+            [ring.logger :as logger]
             [ring.middleware.cors :refer [wrap-cors]]
             [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
@@ -35,6 +36,7 @@
 (def app
   (->
     (handler/site app-routes)
+    logger/wrap-with-logger
     wrap-json-response
     wrap-json-body
     (wrap-cors :access-control-allow-origin #".*"
