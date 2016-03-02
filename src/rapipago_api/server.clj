@@ -1,4 +1,5 @@
 (ns rapipago_api.server
+  (:gen-class)
   (:require [ring.adapter.jetty :as jetty]
            [rapipago_api.handler :as handler]))
 
