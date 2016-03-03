@@ -9,10 +9,10 @@
             [rapipago-scraper.core :as rapipago]
             [rapipago-scraper.provinces :as provinces]
             [rapipago-scraper.cities :as cities]
-            [rapipago_api.es_store :as es_store]))
+            [rapipago_api.es-store :as es-store]))
 
 (defn search-stores [province-id city-id]
-  (es_store/search {:province-id province-id
+  (es-store/search {:province-id province-id
                     :city-id     city-id}))
 
 (defroutes app-routes
@@ -21,11 +21,11 @@
   (GET "/provinces/:province-id/cities" [province-id]
        (response (cities/find-in-province {:id province-id})))
   (GET "/location/:lat,:lon/distance/:distance/stores" [lat lon distance]
-       (response (es_store/distance-search {:lat lat
+       (response (es-store/distance-search {:lat lat
                                             :lon lon}
                                            distance)))
   (GET "/bounding_box/:tr_lat,:tr_lon,:bl_lat,:bl_lon/stores" [tr_lat tr_lon bl_lat bl_lon distance]
-       (response (es_store/bounding-box-search {:lat tr_lat :lon tr_lon}
+       (response (es-store/bounding-box-search {:lat tr_lat :lon tr_lon}
                                                {:lat bl_lat :lon bl_lon})))
   (GET "/provinces/:province-id/cities/:city-id/stores" [province-id city-id]
        (response (search-stores province-id city-id)))

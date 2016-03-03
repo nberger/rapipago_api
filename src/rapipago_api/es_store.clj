@@ -1,4 +1,4 @@
-(ns rapipago_api.es_store
+(ns rapipago_api.es-store
   (:require [clojurewerkz.elastisch.rest :as es]
             [clojurewerkz.elastisch.rest.index :as esi]
             [clojurewerkz.elastisch.rest.document :as esd]
@@ -92,9 +92,6 @@
          (map geolocate)
          (map #(save-rapipago conn %)))))
 
-(comment
-
-  (refresh-city-index "C" "PALERMO")
 
   (defn refresh-province [province-id threads-count]
     (let [out *out*
@@ -106,8 +103,11 @@
                      (println (:name city) ": " (count stores-in-city)))))
                cities)))
 
-  (refresh-province "C" 8)
 
+(comment
+
+  (refresh-city-index "C" "PALERMO")
+  (refresh-province "C" 8)
   (doseq [province (keys (provinces db))] (refresh-province province 10))
 )
 
