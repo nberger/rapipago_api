@@ -94,7 +94,8 @@
   (let [conn (connect)
         rapipagos (build-city-index province-id city-id)]
     (doseq [rapipago rapipagos]
-      (save-rapipago conn rapipago))))
+      (save-rapipago conn rapipago))
+    rapipagos))
 
 (defn refresh-province [province-id threads-count]
   (let [out *out*
