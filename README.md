@@ -4,15 +4,18 @@ JSON API to search rapipago (http://www.rapipago.com) stores
 
 ## Prerequisites
 
-You will need [Leiningen][1] 1.7.0 or above installed.
-
-[1]: https://github.com/technomancy/leiningen
+1. Install elasticsearch and have it running in localhost:9200,
+   or provide the env var `BONSAI_URL` to connect to it
 
 ## Running
 
 To start a web server for the application, run:
 
     lein ring server
+
+## Import stores for bounding box search
+
+    lein run -m rapipago-api.import-stores
 
 ## License
 
