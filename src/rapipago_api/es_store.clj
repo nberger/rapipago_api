@@ -100,8 +100,7 @@
 (defn refresh-province [province-id threads-count]
   (let [out *out*
         cities (cities/find-in-province {:id province-id})]
-    (cp/pdoseq
-      threads-count
+    (doseq
       [city cities]
       (binding [*out* out]
         (let [stores-in-city (refresh-city-index province-id (:id city))]
