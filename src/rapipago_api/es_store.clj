@@ -103,8 +103,11 @@
     (doseq
       [city cities]
       (binding [*out* out]
-        (let [stores-in-city (refresh-city-index province-id (:id city))]
-          (println (:name city) ": " (count stores-in-city)))))))
+        (try
+          (let [stores-in-city (refresh-city-index province-id (:id city))]
+            (println (:name city) ": " (count stores-in-city)))
+          (catch Exception e
+            (println "Exception while processing city " city ". " (.getMessage e))))))))
 
 
 (comment
