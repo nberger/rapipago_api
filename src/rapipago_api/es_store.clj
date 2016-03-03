@@ -91,9 +91,10 @@
        (map geolocate)))
 
 (defn refresh-city-index [province-id city-id]
-  (let [conn (connect)]
-    (->> (build-city-index province-id city-id)
-         (map #(save-rapipago conn %)))))
+  (let [conn (connect)
+        rapipagos (build-city-index province-id city-id)]
+    (doseq [rapipago rapipagos]
+      (save-rapipago conn rapipago))))
 
 (defn refresh-province [province-id threads-count]
   (let [out *out*
@@ -159,8 +160,12 @@
       (map :_source))
 
   (count (search {:province-id "B" :city-id "LANUS"}))
-  (count (search {:province-id "C" :city-id "BALVANERA"}))
+  (count (search {:province-id "C" :city-id "PALERMO"}))
 
+  (->> (search {:province-id "C" :city-id "PALERMO"})
+       first
+       geolocate
+       )
   (distance-search {:lat -34.603272
                     :lon -58.396726}
                    "500m")
