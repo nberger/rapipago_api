@@ -6,7 +6,7 @@
   (println "importing province " province)
   (es-store/refresh-province province 10))
 
-(defn -main [[province & more]]
+(defn -main [& [province & more]]
   (if province
     (import-province province)
     (doseq [province (keys (es-store/provinces es-store/db))]
