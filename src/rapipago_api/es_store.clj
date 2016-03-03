@@ -85,27 +85,30 @@
                 (dissoc :province :city))]
     (esd/put conn index-name "rapipago" (:id rapipago) doc)))
 
+(defn build-city-index [province-id city-id]
+  (->> {:province {:id province-id} :city {:id city-id}}
+       rapipago/search
+       (map geolocate)))
+
 (defn refresh-city-index [province-id city-id]
   (let [conn (connect)]
-    (->> {:province {:id province-id} :city {:id city-id}}
-         rapipago/search
-         (map geolocate)
+    (->> (build-city-index province-id city-id)
          (map #(save-rapipago conn %)))))
 
-
-  (defn refresh-province [province-id threads-count]
-    (let [out *out*
-          cities (cities/find-in-province {:id province-id})]
-      (cp/pmap threads-count
-               (fn [city]
-                 (binding [*out* out]
-                   (let [stores-in-city (refresh-city-index province-id (:id city))]
-                     (println (:name city) ": " (count stores-in-city)))))
-               cities)))
+(defn refresh-province [province-id threads-count]
+  (let [out *out*
+        cities (cities/find-in-province {:id province-id})]
+    (cp/pmap threads-count
+             (fn [city]
+               (binding [*out* out]
+                 (let [stores-in-city (refresh-city-index province-id (:id city))]
+                   (println (:name city) ": " (count stores-in-city)))))
+             cities)))
 
 
 (comment
 
+  (build-city-index "C" "PALERMO")
   (refresh-city-index "C" "PALERMO")
   (refresh-province "C" 8)
   (doseq [province (keys (provinces db))] (refresh-province province 10))
