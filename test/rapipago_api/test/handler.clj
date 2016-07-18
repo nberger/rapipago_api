@@ -4,7 +4,7 @@
             [rapipago-scraper.cities :as cities]
             [cheshire.core :as json])
   (:use clojure.test
-        ring.mock.request  
+        ring.mock.request
         rapipago_api.handler))
 
 (deftest test-app
@@ -17,7 +17,7 @@
       (let [response (app (request :get "/provinces/C/cities/ALMAGRO/stores"))]
         (is (= (:status response) 200))
         #_ (is (= (json/parse-string (:body response) true)
-               dummy-stores)))))
+                dummy-stores)))))
 
   (def dummy-provinces '({:name "Corrientes" :id "C"}
                          {:name "Salta" :id "S"}))
@@ -37,7 +37,7 @@
         (is (= (json/parse-string (:body response) true)
                [{:name "Goya" :id "Goya"}
                 {:name "Corrientes" :id "Corrientes"}])))))
-  
+
   (testing "not-found route"
     (let [response (app (request :get "/invalid"))]
       (is (= (:status response) 404)))))

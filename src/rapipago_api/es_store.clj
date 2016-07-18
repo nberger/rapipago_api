@@ -59,8 +59,8 @@
     (apply str (interpose ", " [address city-id province-name "Argentina"]))))
 
 (comment
-  (get (provinces db) "A")
-  )
+  (get (provinces db) "A"))
+
 
 (defn geolocate [rapipago]
   (assoc rapipago :location
@@ -115,8 +115,8 @@
   (build-city-index "C" "PALERMO")
   (refresh-city-index "C" "PALERMO")
   (refresh-province "C" 8)
-  (doseq [province (keys (provinces db))] (refresh-province province 10))
-)
+  (doseq [province (keys (provinces db))] (refresh-province province 10)))
+
 
 (defn search [{:keys [province-id city-id]}]
   (let [query (q/bool
@@ -140,7 +140,7 @@
 
 (defn trbl->tlbr [top-right bottom-left]
   [{:lat (:lat top-right) :lon (:lon bottom-left)}
-    {:lat (:lat bottom-left) :lon (:lon top-right)}])
+   {:lat (:lat bottom-left) :lon (:lon top-right)}])
 
 (defn bounding-box-search [top-right bottom-left]
   (let [[top-left bottom-right] (trbl->tlbr top-right bottom-left)
@@ -167,8 +167,8 @@
 
   (->> (search {:province-id "C" :city-id "PALERMO"})
        first
-       geolocate
-       )
+       geolocate)
+
   (distance-search {:lat -34.603272
                     :lon -58.396726}
                    "500m")
@@ -177,5 +177,4 @@
   (bounding-box-search {:lat -34.58023769631528
                         :lon -58.38676964013672}
                        {:lat -34.62262718004927
-                        :lon -58.45543419091797})
-  )
+                        :lon -58.45543419091797}))
