@@ -13,7 +13,7 @@
 
   (testing "search"
     (with-redefs [rapipago/search (constantly dummy-stores)
-                  rapipago_api.es_store/geolocate identity]
+                  rapipago_api.es-store/geolocate identity]
       (let [response (app (request :get "/provinces/C/cities/ALMAGRO/stores"))]
         (is (= (:status response) 200))
         #_ (is (= (json/parse-string (:body response) true)
