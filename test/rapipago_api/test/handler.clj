@@ -16,8 +16,11 @@
                   rapipago_api.es-store/geolocate identity]
       (let [response (app (request :get "/provinces/C/cities/ALMAGRO/stores"))]
         (is (= (:status response) 200))
-        #_ (is (= (json/parse-string (:body response) true)
-                dummy-stores)))))
+        ;; TODO: this test is fetching right from ES. There's not much value in mocking
+        ;; that. We should replace this test by a test where the import process is mocked
+        ;; but it puts results in ES, then we test searching on that dataset.
+        #_(is (= (json/parse-string (:body response) true)
+                 dummy-stores)))))
 
   (def dummy-provinces '({:name "Corrientes" :id "C"}
                          {:name "Salta" :id "S"}))
